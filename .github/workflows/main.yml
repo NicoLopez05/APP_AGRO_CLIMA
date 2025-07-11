@@ -27,20 +27,20 @@ jobs:
 
              
       - name: Install dependencies
-        working-directory: AGRO_CLIMA_APP/AGRO_CLIMA_APP
+        working-directory: AGRO_CLIMA_APP/
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Start FastAPI backend
-        working-directory: AGRO_CLIMA_APP/AGRO_CLIMA_APP
+        working-directory: AGRO_CLIMA_APP/
         run: |
           nohup python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 &
         env:
           PYTHONPATH: .
 
       - name: Start frontend
-        working-directory: AGRO_CLIMA_APP/AGRO_CLIMA_APP
+        working-directory: AGRO_CLIMA_APP/
         run: |
           nohup python frontend.py &
         env:
@@ -57,6 +57,6 @@ jobs:
           which chromedriver
           
       - name: Run tests
-        working-directory: AGRO_CLIMA_APP/AGRO_CLIMA_APP
+        working-directory: AGRO_CLIMA_APP/
         run: |
           python -m pytest --cov=app tests/
