@@ -12,7 +12,7 @@ python-dotenv
 # Additional libraries
 selenium
 requests
-
+webdriver-manager
 # Tools for testing & formatting
 pytest
 pytest-cov
