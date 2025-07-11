@@ -34,3 +34,9 @@ class SensorUpdate(BaseModel):
     ubicacion: str
     zona: str
     cultivo: str
+
+from pydantic import BaseModel
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str

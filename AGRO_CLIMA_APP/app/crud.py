@@ -34,4 +34,15 @@ def delete_sensor(db: Session, sensor_id: int):
     if sensor:
         db.delete(sensor)
         db.commit()
+        return True
+    return False
+
+
+def update_sensor(db: Session, sensor_id: int, sensor_data: schemas.SensorUpdate):
+    sensor = db.query(models.Sensor).filter(models.Sensor.id == sensor_id).first()
+    if sensor:
+        for key, value in sensor_data.model_dump().items():
+            setattr(sensor, key, value)
+        db.commit()
+        db.refresh(sensor)
     return sensor

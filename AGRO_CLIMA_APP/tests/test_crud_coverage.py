@@ -3,6 +3,8 @@
 from app import crud, models, schemas
 from app.database import SessionLocal
 from sqlalchemy.orm import Session
+from app.schemas import SensorUpdate
+
 import pytest
 
 @pytest.fixture
@@ -53,16 +55,8 @@ def test_delete_sensor(db: Session):
         deleted = crud.delete_sensor(db, sensor.id)
         assert deleted is True or deleted is not None
 
-def update_sensor(db: Session, sensor_id: int, sensor_update: schemas.SensorUpdate):
-    sensor = db.query(models.Sensor).filter(models.Sensor.id == sensor_id).first()
-    if not sensor:
-        return None
 
-    for field, value in sensor_update.model_dump().items():
-        setattr(sensor, field, value)
-    
-    db.commit()
-    db.refresh(sensor)
-    return sensor
+
+
 
 

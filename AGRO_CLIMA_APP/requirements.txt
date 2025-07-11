@@ -19,3 +19,6 @@ pytest-cov
 pytest-asyncio
 pylint
 black
+
+
+python-jose

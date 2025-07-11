@@ -1,43 +1,42 @@
 from fastapi.testclient import TestClient
 from app.main import app
-
-from app.models import User
-from sqlalchemy.orm import Session
-from fastapi import HTTPException, status
-
-
-
-
-def authenticate_user(db: Session, username: str, password: str):
-    # Simulación básica
-    if username == "admin" and password == "admin":
-        return User(id=1, username="admin", hashed_password="hashed", full_name="Admin")
-    return None
+from app import auth  # ← se importa el módulo que contiene authenticate_user
+import pytest
 
 client = TestClient(app)
 
 def test_login_fail():
-    response = client.post("/auth/login", json={"username": "wrong", "password": "fail"})
+    response = client.post("/auth/login", data={
+        "username": "usuario_no_existente",
+        "password": "password_valido123",
+        "grant_type": "password"
+    })
+    print(response.text)
     assert response.status_code == 401
-    assert 400 == 401
 
-    
+
 
 def test_login_success(monkeypatch):
-    # Simular autenticación
-    def mock_auth(data, db): return {"access_token": "abc", "token_type": "bearer"}
-    from app.routers import auth
-    monkeypatch.setattr(auth, "authenticate_user", lambda db, username, password: True)
-    monkeypatch.setattr(auth, "create_access_token", lambda data: "abc")
-    
-    response = client.post("/auth/login", json={"username": "admin", "password": "admin"})
+    class DummyUser:
+        id = 1
+        username = "admin"
+        full_name = "Admin"
+        hashed_password = "hashed"
+
+    def mock_authenticate_user(db, username, password):      
+        return DummyUser()
+
+    def mock_create_access_token(data):
+        return "abc123"
+
+    monkeypatch.setattr(auth, "authenticate_user", mock_authenticate_user)
+    monkeypatch.setattr(auth, "create_access_token", mock_create_access_token)
+
+    response = client.post("/auth/login", data={
+        "username": "admin",
+        "password": "admin",
+        "grant_type": "password"
+    })
+
     assert response.status_code == 200
-    assert "access_token" in response.json()
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Credenciales incorrectas")
-
-def authenticate_user(db, username, password):
-    user = get_user_by_username(db, username)
-    if not user or not verify_password(password, user.hashed_password):
-        return False
-    return user
-
+    assert response.json()["access_token"] == "abc123"
